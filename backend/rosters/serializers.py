@@ -7,6 +7,7 @@ class ClassBatchViewSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class LearnerViewSerializer(serializers.ModelSerializer):
+    class_batches = ClassBatchViewSerializer(many=True, read_only=True)
     class Meta:
         model = Learner
         fields = "__all__"
