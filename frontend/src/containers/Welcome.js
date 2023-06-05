@@ -1,140 +1,145 @@
-import React, { useEffect, useState } from 'react';
-import { compose } from 'redux';
-import { Link } from 'react-router-dom';
-import withAPI from '../services/api';
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Button,
+  Typography,
+  Container,
+  Grid,
+  TextField,
+  FormControl,
+  Card,
+  CardContent,
+} from "@mui/material";
+import { useDispatch, useSelector } from "../store";
+import { getLearners, getLearner, getClassBatch } from "../store/slices/roster";
 
-import logo from '../static/logo.svg';
-import '../App.css';
+const Welcome = () => {
+  const [learnerSearchId, setLearnerSearchId] = useState("");
+  const [classBatchSearchId, setClassBatchSearchId] = useState("");
+  const dispatch = useDispatch();
+  const { totalLearners, learner, classbatch } = useSelector(
+    (state) => state.roster
+  );
 
-const Welcome = ({ api }) => {
+  useEffect(() => {
+    dispatch(getLearners());
+  }, [dispatch]);
 
-  const [learnerSearchText, setLearnerSearchText] = useState(null);
-  const [learnerResult, setLearnerResult] = useState(null);
-  const [classbatchSearchText, setClassBatchSearchText] = useState(null);
-  const [classbatchResult, setClassBatchResult] = useState(null);
+  useEffect(() => {
+    dispatch(getClassBatch(classBatchSearchId));
+  }, [dispatch, classBatchSearchId]);
 
-  const learnerSearch = (text) => {
-    setLearnerResult(null);
-    api
-      .fetchLearner(text)
-      .then((res) => {
-        console.log("Received Learner:",res);
-        setLearnerResult(res);
-      })
-      .catch((e) => {
-        console.log("Error fetching Learner: ",e);
-        setLearnerResult('No results found...');
-      });
-  }
-  const classbatchSearch = (text) => {
-    setClassBatchResult(null);
-    api
-      .fetchClassBatch(text)
-      .then((res) => {
-        console.log("Received ClassBatch:",res);
-        setClassBatchResult(res);
-      })
-      .catch((e) => {
-        console.log("Error fetching ClassBatch: ",e);
-        setClassBatchResult('No results found...');
-      });
-  }
+  useEffect(() => {
+    dispatch(getLearner(learnerSearchId));
+  }, [dispatch, learnerSearchId]);
+
+  const handleClassBatchSearch = (e) => {
+    setClassBatchSearchId(e.target.value);
+  };
+
+  const handleLearnerSearch = (e) => {
+    setLearnerSearchId(e.target.value);
+  };
+
+  const renderClassBatchCard = () => {
+    if (classbatch === null) return null;
+
+    return (
+      <Card>
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Typography gutterBottom variant="h5" component="h2">
+            This is a ClassBatch {classbatch.id} Card
+          </Typography>
+          <Typography>
+            <Button href={`/classbatch/${classbatch.id}`}>
+              {classbatch.name}
+            </Button>
+          </Typography>
+          <Typography></Typography>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderLearnerCard = () => {
+    if (learner === null) return null;
+
+    return (
+      <Card>
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Typography gutterBottom variant="h5" component="h2">
+            This is a Learner {learner.id} Card
+          </Typography>
+          <Typography>
+            {learner.first_name + " " + learner.last_name}
+          </Typography>
+          <Typography>{learner.grade4}</Typography>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
-    <div className="App">
-      <div>
-        <p>
-          Find Learner by id
-        </p>
-      </div>
-      <div>
-        <input
-          type="text"
-          onChange={(e) => setLearnerSearchText(e.target.value)}
-          value={learnerSearchText}
-        />
-        <button
-          onClick={() => learnerSearch(learnerSearchText)}
-        >
-          Search
-        </button>
-      </div>
-      <div>
-        {learnerResult && learnerResult.id && (
-          <React.Fragment>
-            <p>
-              {"Results:"}
-            </p>
-            <div>
-              <p>
-                {"Learner "+learnerResult.id+": "}
-                <Link
-                  to={{
-                    pathname: `/learner/${learnerResult.id}`,
-                  }}
-                >
-                  {learnerResult.first_name} {learnerResult.last_name}
-                </Link>
-              </p>
-            </div>
-          </React.Fragment>
-        )}
-        {learnerResult && !learnerResult.id && (
-          <p>
-            No results found...
-          </p>
-        )}
-      </div>
-
-      <div><p>OR</p></div>
-
-      <div>
-        <p>
-          Find ClassBatch by id
-        </p>
-      </div>
-      <div>
-        <input
-          type="text"
-          onChange={(e) => setClassBatchSearchText(e.target.value)}
-          value={classbatchSearchText}
-        />
-        <button
-          onClick={() => classbatchSearch(classbatchSearchText)}
-        >
-          Search
-        </button>
-      </div>
-      <div>
-        {classbatchResult && classbatchResult.id && (
-          <React.Fragment>
-            <p>
-              {"Results:"}
-            </p>
-            <div>
-              <p>
-                {"ClassBatch "+classbatchResult.id+": "}
-                <Link
-                  to={{
-                    pathname: `/classbatch/${classbatchResult.id}`,
-                  }}
-                >
-                  {classbatchResult.name}
-                </Link>
-              </p>
-            </div>
-          </React.Fragment>
-        )}
-        {classbatchResult && !classbatchResult.id && (
-          <p>
-            No results found...
-          </p>
-        )}
-      </div>
-    </div>
+    <main>
+      <Box sx={{ bgcolor: "background.paper", pt: 8, pb: 6 }}>
+        <Container>
+          <Typography
+            component="h1"
+            variant="h2"
+            align="center"
+            color="text.primary"
+            gutterBottom
+          >
+            Welcome
+          </Typography>
+          <Typography
+            variant="h5"
+            align="center"
+            color="text.secondary"
+            paragraph
+          >
+            Total Learners: {totalLearners}
+          </Typography>
+          <Grid container spacing={2} pt={5}>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth variant="standard">
+                <TextField
+                  id="outlined-search"
+                  label="Search By ClassBatch ID"
+                  onChange={handleClassBatchSearch}
+                  type="number"
+                />
+              </FormControl>
+              {renderClassBatchCard()}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth variant="standard">
+                <TextField
+                  id="outlined-search"
+                  label="Search By Learner ID"
+                  onChange={handleLearnerSearch}
+                  type="number"
+                />
+              </FormControl>
+              {renderLearnerCard()}
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} pt={5} justifyContent="center">
+            <Grid item>
+              <Button href="/classbatches" variant="outlined">
+                View ClassBatches
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button href="/learners" variant="outlined">
+                View All Learners
+              </Button>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+    </main>
   );
-}
+};
 
-export default compose(
-  withAPI
-)(Welcome);
+export default Welcome;

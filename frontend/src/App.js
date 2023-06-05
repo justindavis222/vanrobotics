@@ -1,27 +1,36 @@
-//import { render } from 'react-dom';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AppBar from "@mui/material/AppBar";
+import CssBaseline from "@mui/material/CssBaseline";
+import Toolbar from "@mui/material/Toolbar";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
 
-import withAPI from './services/api';
+import { Welcome, ClassBatches, ClassBatch, Learners } from "./containers";
+const defaultTheme = createTheme();
 
-import { 
-  Welcome,
-  ClassBatch,
-  Learner,
-} from './containers';
-
-const App = ({ api }) => {
+const App = () => {
   return (
     <section className="main-container">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Welcome />} />
-          <Route path="/learner/:learnerId" element={<Learner />} />
-          <Route path="/classbatch/:classbatchId" element={<ClassBatch />} />
-        </Routes>
-      </BrowserRouter>
+      <ThemeProvider theme={defaultTheme}>
+        <CssBaseline />
+        <AppBar position="relative">
+          <Toolbar>
+            <Typography variant="h6" color="inherit" noWrap>
+              Van Robotics
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Welcome />} />
+            <Route path="/classbatch/:classbatchId" element={<ClassBatch />} />
+            <Route path="/learners" element={<Learners />} />
+            <Route path="/classbatches" element={<ClassBatches />} />
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
     </section>
   );
-}
+};
 
 export default App;

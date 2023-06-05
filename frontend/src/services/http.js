@@ -1,16 +1,31 @@
 const resolveWithFull = (resp) => {
+  if (resp.status === 204) {
+    return new Promise((resolve, reject) => {
+      resp
+        .text()
+        .then((resp_json) => {
+          return resolve([resp, resp_json]);
+        })
+        .catch((e) => {
+          reject(e);
+        });
+    });
+  }
   return new Promise((resolve, reject) => {
-    resp.json().then((resp_json) => {
-      return resolve([resp, resp_json])
-    }).catch((e) => {
-      reject(e);
-    })
-  })
-}
+    resp
+      .json()
+      .then((resp_json) => {
+        return resolve([resp, resp_json]);
+      })
+      .catch((e) => {
+        reject(e);
+      });
+  });
+};
 
 const handleErr = ([resp, resp_json]) => {
   if (!resp.ok) {
-    let err = resp_json.message || 'Something went wrong.'
+    let err = resp_json.message || "Something went wrong.";
     if (resp_json.error) {
       err = resp_json.error;
     }
@@ -18,7 +33,7 @@ const handleErr = ([resp, resp_json]) => {
   }
 
   return [resp, resp_json];
-}
+};
 
 const fetchWithError = (...rest) => {
   return fetch(...rest)
@@ -29,7 +44,7 @@ const fetchWithError = (...rest) => {
       console.log(e);
       //throw new Error(e);
       throw e;
-    })
-}
+    });
+};
 
 export { resolveWithFull, handleErr, fetchWithError };
